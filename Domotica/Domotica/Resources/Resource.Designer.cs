@@ -63,17 +63,20 @@ namespace Domotica
 			// aapt resource value: 0x7f060000
 			public const int Connectlayout = 2131099648;
 			
+			// aapt resource value: 0x7f060018
+			public const int Controllayout = 2131099672;
+			
 			// aapt resource value: 0x7f060011
 			public const int PlantLayout = 2131099665;
 			
-			// aapt resource value: 0x7f06001d
-			public const int abort = 2131099677;
+			// aapt resource value: 0x7f06001e
+			public const int abort = 2131099678;
+			
+			// aapt resource value: 0x7f06001c
+			public const int aqbar = 2131099676;
 			
 			// aapt resource value: 0x7f06001b
-			public const int aqbar = 2131099675;
-			
-			// aapt resource value: 0x7f06001a
-			public const int aqualitytxt = 2131099674;
+			public const int aqualitytxt = 2131099675;
 			
 			// aapt resource value: 0x7f06000a
 			public const int buttonChangePinState = 2131099658;
@@ -87,14 +90,14 @@ namespace Domotica
 			// aapt resource value: 0x7f060008
 			public const int editTextIPPort = 2131099656;
 			
-			// aapt resource value: 0x7f06001c
-			public const int exit = 2131099676;
-			
-			// aapt resource value: 0x7f060018
-			public const int humidity = 2131099672;
+			// aapt resource value: 0x7f06001d
+			public const int exit = 2131099677;
 			
 			// aapt resource value: 0x7f060019
-			public const int humidityBar = 2131099673;
+			public const int humidity = 2131099673;
+			
+			// aapt resource value: 0x7f06001a
+			public const int humidityBar = 2131099674;
 			
 			// aapt resource value: 0x7f060012
 			public const int linearLayout2 = 2131099666;

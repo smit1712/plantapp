@@ -58,7 +58,7 @@ namespace Domotica
         public TextView airqualitytxt,humiditytxt,windtxt,raintxt, textViewChangePinStateValue, textViewSensorValue, textViewDebugValue;
         EditText editTextIPAddress, editTextIPPort;
         RelativeLayout connectlayout;
-        LinearLayout plantlayout;
+        LinearLayout plantlayout,controllayout;
         ToggleButton raintbtn, windbtn;
         ProgressBar humidity, Airquality;
         Timer timerClock, timerSockets;            // Timers   
@@ -87,6 +87,7 @@ namespace Domotica
             editTextIPPort = FindViewById<EditText>(Resource.Id.editTextIPPort);
             connectlayout = FindViewById<RelativeLayout>(Resource.Id.Connectlayout);
             plantlayout = FindViewById<LinearLayout>(Resource.Id.PlantLayout);
+            controllayout = FindViewById<LinearLayout>(Resource.Id.Controllayout);
             raintxt = FindViewById<TextView>(Resource.Id.rainTXT);
             windtxt = FindViewById<TextView>(Resource.Id.windTXT);
             raintbtn = FindViewById<ToggleButton>(Resource.Id.raintBTN);
@@ -147,6 +148,7 @@ namespace Domotica
                         ConnectSocket(editTextIPAddress.Text, editTextIPPort.Text);
                         connectlayout.Visibility = ViewStates.Gone;
                         plantlayout.Visibility = ViewStates.Visible;
+                        controllayout.Visibility = ViewStates.Visible;
                     }
                     else UpdateConnectionState(3, "Please check IP");
                 };

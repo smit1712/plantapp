@@ -184,26 +184,32 @@
                 android:id="@+id/windBTN" />
         </LinearLayout>
     </LinearLayout>
-    <TextView
-        android:text="humidity"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/humidity" />
-    <ProgressBar
-        style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
-        android:id="@+id/humidityBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:text="Air Quality"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/aqualitytxt" />
-    <ProgressBar
-        style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
-        android:id="@+id/aqbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:id="@+id/Controllayout">
+        <TextView
+            android:text="humidity"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/humidity" />
+        <ProgressBar
+            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            android:id="@+id/humidityBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:text="Air Quality"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/aqualitytxt" />
+        <ProgressBar
+            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            android:id="@+id/aqbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </LinearLayout>
