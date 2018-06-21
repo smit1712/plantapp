@@ -168,6 +168,13 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/windTXT"
                 android:paddingTop="60px" />
+            <TextView
+                android:text="Sun"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/sunTXT"
+                android:paddingTop="60px" />
         </LinearLayout>
         <LinearLayout
             android:orientation="vertical"
@@ -182,6 +189,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/windBTN" />
+            <ToggleButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/sunBTN" />
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -209,6 +220,17 @@
         <ProgressBar
             style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
             android:id="@+id/aqbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:text="Tempature"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/Temptxt" />
+        <ProgressBar
+            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            android:id="@+id/tempbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>

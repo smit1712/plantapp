@@ -55,14 +55,14 @@ namespace Domotica
         Button buttonConnect;
         Button buttonChangePinState;
         TextView textViewServerConnect, textViewTimerStateValue;
-        public TextView airqualitytxt,humiditytxt,windtxt,raintxt, textViewChangePinStateValue, textViewSensorValue, textViewDebugValue;
+        public TextView temptxt,suntxt, airqualitytxt,humiditytxt,windtxt,raintxt, textViewChangePinStateValue, textViewSensorValue, textViewDebugValue;
         EditText editTextIPAddress, editTextIPPort;
         RelativeLayout connectlayout;
         LinearLayout plantlayout,controllayout;
-        ToggleButton raintbtn, windbtn;
-        ProgressBar humidity, Airquality;
+        ToggleButton sunbtn, raintbtn, windbtn;
+        ProgressBar temp,humidity, Airquality;
         Timer timerClock, timerSockets;            // Timers   
-        Socket socket = null;                       // Socket   
+        Socket socket = null;                       // Socket           
         List<Tuple<string, TextView>> commandList = new List<Tuple<string, TextView>>();  // List for commands and response places on UI
         int listIndex = 0;
 
@@ -89,24 +89,34 @@ namespace Domotica
             plantlayout = FindViewById<LinearLayout>(Resource.Id.PlantLayout);
             controllayout = FindViewById<LinearLayout>(Resource.Id.Controllayout);
             raintxt = FindViewById<TextView>(Resource.Id.rainTXT);
+            temptxt = FindViewById<TextView>(Resource.Id.Temptxt);
             windtxt = FindViewById<TextView>(Resource.Id.windTXT);
+            suntxt = FindViewById<TextView>(Resource.Id.sunTXT);
+            sunbtn = FindViewById<ToggleButton>(Resource.Id.sunBTN);
             raintbtn = FindViewById<ToggleButton>(Resource.Id.raintBTN);
             windbtn = FindViewById<ToggleButton>(Resource.Id.windBTN);
             airqualitytxt = FindViewById<TextView>(Resource.Id.aqualitytxt);
             humiditytxt = FindViewById<TextView>(Resource.Id.humidity);
             humidity = FindViewById<ProgressBar>(Resource.Id.humidityBar);
             Airquality = FindViewById<ProgressBar>(Resource.Id.aqbar);
+            temp = FindViewById<ProgressBar>(Resource.Id.tempbar);
             UpdateConnectionState(4, "Disconnected");
 
             plantlayout.Visibility = ViewStates.Gone;
+            controllayout.Visibility = ViewStates.Gone;
+            
             // Init commandlist, scheduled by socket timer
             commandList.Add(new Tuple<string, TextView>("s", textViewChangePinStateValue));
             commandList.Add(new Tuple<string, TextView>("R", textViewSensorValue));// rain on command
             commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue));// rain off command
             commandList.Add(new Tuple<string, TextView>("W", textViewSensorValue));// wind on command
             commandList.Add(new Tuple<string, TextView>("w", textViewSensorValue));// wind off command
+            commandList.Add(new Tuple<string, TextView>("Z", textViewSensorValue));// sun on command
+            commandList.Add(new Tuple<string, TextView>("z", textViewSensorValue));// sun off command
+
             commandList.Add(new Tuple<string, TextView>("h", textViewSensorValue));// request humidity
             commandList.Add(new Tuple<string, TextView>("a", textViewSensorValue));// request air quality
+            commandList.Add(new Tuple<string, TextView>("t", textViewSensorValue));// request temp
 
 
 
@@ -145,7 +155,7 @@ namespace Domotica
                     //Validate the user input (IP address and port)
                     if (CheckValidIpAddress(editTextIPAddress.Text) && CheckValidPort(editTextIPPort.Text))
                     {
-                        ConnectSocket(editTextIPAddress.Text, editTextIPPort.Text);
+                      //  ConnectSocket(editTextIPAddress.Text, editTextIPPort.Text);
                         connectlayout.Visibility = ViewStates.Gone;
                         plantlayout.Visibility = ViewStates.Visible;
                         controllayout.Visibility = ViewStates.Visible;
@@ -185,6 +195,17 @@ namespace Domotica
                     executeCommand("w");
                 }
             };
+            sunbtn.Click += delegate
+            {
+                if (sunbtn.Checked)
+                {
+                    executeCommand("Z");
+                }
+                else
+                {
+                    executeCommand("z");
+                }
+            };
         }
 
 
@@ -192,6 +213,9 @@ namespace Domotica
         {
             humidity.Progress = Convert.ToInt32(executeCommand("h"));
             Airquality.Progress = Convert.ToInt32(executeCommand("a"));
+            temp.Progress = Convert.ToInt32(executeCommand("t"));
+            
+           
         }
 
         //Send command to server and wait for response (blocking)
