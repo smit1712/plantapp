@@ -1,31 +1,4 @@
-﻿// Xamarin/C# app voor de besturing van een Arduino (Uno met Ethernet Shield) m.b.v. een socket-interface.
-// Dit programma werkt samen met het Arduino-programma DomoticaServer.ino
-// De besturing heeft betrekking op het aan- en uitschakelen van een Arduino pin, waar een led aan kan hangen of, 
-// t.b.v. het Domotica project, een RF-zender waarmee een klik-aan-klik-uit apparaat bestuurd kan worden.
-//
-// De socket-communicatie werkt in is gebaseerd op een timer, waarbij het opvragen van gegevens van de 
-// Arduino (server) m.b.v. een Timer worden gerealisseerd.
-//
-// Werking: De communicatie met de (Arduino) server is gebaseerd op een socket-interface. Het IP- en Port-nummer
-// is instelbaar. Na verbinding kunnen, middels een eenvoudig commando-protocol, opdrachten gegeven worden aan 
-// de server (bijv. pin aan/uit). Indien de server om een response wordt gevraagd (bijv. led-status of een
-// sensorwaarde), wordt deze in een 4-bytes ASCII-buffer ontvangen, en op het scherm geplaatst. Alle commando's naar 
-// de server zijn gecodeerd met 1 char.
-//
-// Aanbeveling: Bestudeer het protocol in samenhang met de code van de Arduino server.
-// Het default IP- en Port-nummer (zoals dat in het GUI verschijnt) kan aangepast worden in de file "Strings.xml". De
-// ingestelde waarde is gebaseerd op je eigen netwerkomgeving, hier (en in de Arduino-code) is dat een router, die via DHCP
-// in het segment 192.168.1.x IP-adressen uitgeeft.
-// 
-// Resource files:
-//   Main.axml (voor het grafisch design, in de map Resources->layout)
-//   Strings.xml (voor alle statische strings in het interface (ook het default IP-adres), in de map Resources->values)
-// 
-// De software is verder gedocumenteerd in de code. Tijdens de colleges wordt er nadere uitleg over gegeven.
-// 
-// Versie 1.2, 16/12/2016
-// S. Oosterhaven
-//
+﻿
 using System;
 using System.Text;
 using System.Net;
@@ -120,7 +93,8 @@ namespace Domotica
 
 
 
-            this.Title = this.Title + " (timer sockets)";
+            this.Title = "titlenotset";
+            this.Window.SetTitle("titleset");
 
             // timer object, running clock
             timerClock = new System.Timers.Timer() { Interval = 2000, Enabled = true }; // Interval >= 1000
@@ -156,9 +130,10 @@ namespace Domotica
                     if (CheckValidIpAddress(editTextIPAddress.Text) && CheckValidPort(editTextIPPort.Text))
                     {
                       //  ConnectSocket(editTextIPAddress.Text, editTextIPPort.Text);
-                        connectlayout.Visibility = ViewStates.Gone;
-                        plantlayout.Visibility = ViewStates.Visible;
-                        controllayout.Visibility = ViewStates.Visible;
+                        connectlayout.Visibility = ViewStates.Gone;// when connection is made, the connectlayout is hidden
+                        plantlayout.Visibility = ViewStates.Visible;// when connection is made, the plantlayout is visible
+                        controllayout.Visibility = ViewStates.Visible;// when connection is made, the plantlayout is visible
+                        this.Title = "Smart Terrarium";
                     }
                     else UpdateConnectionState(3, "Please check IP");
                 };
@@ -172,7 +147,7 @@ namespace Domotica
                     socket.Send(Encoding.ASCII.GetBytes("t"));                 // Send toggle-command to the Arduino
                 };
             }
-
+            //rain,wind,sun buttonevents  when toggled they send a command to the arduino
             raintbtn.Click += delegate
             {              
                 if (raintbtn.Checked)
@@ -208,7 +183,7 @@ namespace Domotica
             };
         }
 
-
+        //happens when the gui is updated, it updates the progressbars
         public void UpdateBar()
         {
             humidity.Progress = Convert.ToInt32(executeCommand("h"));
