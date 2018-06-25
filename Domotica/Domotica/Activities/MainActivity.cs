@@ -17,6 +17,7 @@ using Android.Graphics;
 using System.Threading.Tasks;
 
 
+
 namespace Domotica
 {
     [Activity(Label = "@string/application_name", MainLauncher = true, Icon = "@drawable/icon", ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait)]
@@ -109,13 +110,13 @@ namespace Domotica
             timerSockets.Elapsed += (obj, args) =>
             {
                 //RunOnUiThread(() =>
-                //{
+                //{C:\Projects\plantapp\Domotica\Domotica\Activities\MainActivity.cs
                     if (socket != null) // only if socket exists
                     {
                         // Send a command to the Arduino server on every tick (loop though list)
                         UpdateGUI(executeCommand(commandList[listIndex].Item1), commandList[listIndex].Item2);  //e.g. UpdateGUI(executeCommand("s"), textViewChangePinStateValue);
-                        if (++listIndex >= commandList.Count) listIndex = 0;
-                    UpdateBar();
+                    
+                    if (++listIndex >= commandList.Count) listIndex = 0;                  
                     }
                     else timerSockets.Enabled = false;  // If socket broken -> disable timer
                 //});
@@ -129,7 +130,7 @@ namespace Domotica
                     //Validate the user input (IP address and port)
                     if (CheckValidIpAddress(editTextIPAddress.Text) && CheckValidPort(editTextIPPort.Text))
                     {
-                      //  ConnectSocket(editTextIPAddress.Text, editTextIPPort.Text);
+                        ConnectSocket(editTextIPAddress.Text, editTextIPPort.Text);
                         connectlayout.Visibility = ViewStates.Gone;// when connection is made, the connectlayout is hidden
                         plantlayout.Visibility = ViewStates.Visible;// when connection is made, the plantlayout is visible
                         controllayout.Visibility = ViewStates.Visible;// when connection is made, the plantlayout is visible
@@ -150,47 +151,76 @@ namespace Domotica
             //rain,wind,sun buttonevents  when toggled they send a command to the arduino
             raintbtn.Click += delegate
             {              
-                if (raintbtn.Checked)
+                if (raintbtn.Checked && CheckCon(socket) == true)
                 {
-                    executeCommand("R");                    
+                    socket.Send(Encoding.ASCII.GetBytes("R"));                 // Send toggle-command to the Arduino
+                 
                 }
                 else
                 {
-                    executeCommand("r");
+                    if (CheckCon(socket) == true)
+                    {
+                    socket.Send(Encoding.ASCII.GetBytes("r"));                 // Send toggle-command to the Arduino 
+                    }
                 }
             };
             windbtn.Click += delegate
             {              
-                if (windbtn.Checked)
+                if (windbtn.Checked && CheckCon(socket) == true)
                 {
-                    executeCommand("W");
+                    socket.Send(Encoding.ASCII.GetBytes("W"));                 // Send toggle-command to the Arduino
+                    
                 }
                 else
                 {
-                    executeCommand("w");
+                    if(CheckCon(socket) == true)
+                    {
+                    socket.Send(Encoding.ASCII.GetBytes("w"));                 // Send toggle-command to the Arduino
+                    }
                 }
             };
             sunbtn.Click += delegate
             {
-                if (sunbtn.Checked)
+                if (sunbtn.Checked && CheckCon(socket) == true)
                 {
-                    executeCommand("Z");
+                    socket.Send(Encoding.ASCII.GetBytes("Z"));                 // Send toggle-command to the Arduino
                 }
                 else
                 {
-                    executeCommand("z");
-                }
+                    if (CheckCon(socket) == true)
+                    {
+                        socket.Send(Encoding.ASCII.GetBytes("z"));                 // Send toggle-command to the Arduino
+                    }
+                    }
             };
         }
 
         //happens when the gui is updated, it updates the progressbars
         public void UpdateBar()
         {
-            humidity.Progress = Convert.ToInt32(executeCommand("h"));
+            humidity.Progress = 50; //Convert.ToInt32(executeCommand("h"));
             Airquality.Progress = Convert.ToInt32(executeCommand("a"));
             temp.Progress = Convert.ToInt32(executeCommand("t"));
             
            
+        }
+
+        public bool CheckCon(Socket socket)
+        {
+            if (socket == null)
+            {
+                connectlayout.Visibility = ViewStates.Visible;
+                plantlayout.Visibility = ViewStates.Gone;
+                controllayout.Visibility = ViewStates.Gone;
+                return false;
+            }
+            else
+            {
+                connectlayout.Visibility = ViewStates.Gone;
+                plantlayout.Visibility = ViewStates.Visible;
+                controllayout.Visibility = ViewStates.Visible;
+                return true;
+            }
         }
 
         //Send command to server and wait for response (blocking)
@@ -268,12 +298,15 @@ namespace Domotica
         //Update GUI based on Arduino response
         public void UpdateGUI(string result, TextView textview)
         {
+
+            UpdateBar();
             RunOnUiThread(() =>
             {
                 if (result == "OFF") textview.SetTextColor(Color.Red);
                 else if (result == " ON") textview.SetTextColor(Color.Green);
                 else textview.SetTextColor(Color.White);  
                 textview.Text = result;
+               
             });
         }
 
@@ -288,6 +321,8 @@ namespace Domotica
                     try  // to connect to the server (Arduino).
                     {
                         socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                        //socket.SendTimeout = 1000;
+                        //socket.ReceiveTimeout = 1000;
                         socket.Connect(new IPEndPoint(IPAddress.Parse(ip), Convert.ToInt32(prt)));
                         if (socket.Connected)
                         {
