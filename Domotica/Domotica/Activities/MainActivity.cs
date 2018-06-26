@@ -81,21 +81,21 @@ namespace Domotica
             
             // Init commandlist, scheduled by socket timer
             commandList.Add(new Tuple<string, TextView>("s", textViewChangePinStateValue));
-            commandList.Add(new Tuple<string, TextView>("R", textViewSensorValue));// rain on command
-            commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue));// rain off command
-            commandList.Add(new Tuple<string, TextView>("W", textViewSensorValue));// wind on command
-            commandList.Add(new Tuple<string, TextView>("w", textViewSensorValue));// wind off command
-            commandList.Add(new Tuple<string, TextView>("Z", textViewSensorValue));// sun on command
-            commandList.Add(new Tuple<string, TextView>("z", textViewSensorValue));// sun off command
+            //commandList.Add(new Tuple<string, TextView>("R", textViewSensorValue));// rain on command
+            //commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue));// rain off command
+            //commandList.Add(new Tuple<string, TextView>("W", textViewSensorValue));// wind on command
+            //commandList.Add(new Tuple<string, TextView>("w", textViewSensorValue));// wind off command
+            //commandList.Add(new Tuple<string, TextView>("Z", textViewSensorValue));// sun on command
+            //commandList.Add(new Tuple<string, TextView>("z", textViewSensorValue));// sun off command
 
-            commandList.Add(new Tuple<string, TextView>("h", textViewSensorValue));// request humidity
-            commandList.Add(new Tuple<string, TextView>("a", textViewSensorValue));// request air quality
-            commandList.Add(new Tuple<string, TextView>("t", textViewSensorValue));// request temp
+            //commandList.Add(new Tuple<string, TextView>("h", textViewSensorValue));// request humidity
+            //commandList.Add(new Tuple<string, TextView>("a", textViewSensorValue));// request air quality
+            //commandList.Add(new Tuple<string, TextView>("t", textViewSensorValue));// request temp
 
 
 
-            this.Title = "titlenotset";
-            this.Window.SetTitle("titleset");
+            this.Title = "Connect To Terrarium";
+            
 
             // timer object, running clock
             timerClock = new System.Timers.Timer() { Interval = 2000, Enabled = true }; // Interval >= 1000
@@ -110,7 +110,7 @@ namespace Domotica
             timerSockets.Elapsed += (obj, args) =>
             {
                 //RunOnUiThread(() =>
-                //{C:\Projects\plantapp\Domotica\Domotica\Activities\MainActivity.cs
+                
                     if (socket != null) // only if socket exists
                     {
                         // Send a command to the Arduino server on every tick (loop though list)
@@ -198,11 +198,15 @@ namespace Domotica
         //happens when the gui is updated, it updates the progressbars
         public void UpdateBar()
         {
-            humidity.Progress = 50; //Convert.ToInt32(executeCommand("h"));
-            Airquality.Progress = Convert.ToInt32(executeCommand("a"));
-            temp.Progress = Convert.ToInt32(executeCommand("t"));
-            
-           
+            string h = executeCommand("h");
+            string a = executeCommand("a");
+            string t = executeCommand("t");
+            humidity.Progress = Convert.ToInt32("h");
+            Airquality.Progress = Convert.ToInt32("a");
+            temp.Progress = Convert.ToInt32("t");
+            humiditytxt.Text = "humidity: " + h;
+            airqualitytxt.Text = "Air Quality:" + a;
+            temptxt.Text = "Tempature: " + t;
         }
 
         public bool CheckCon(Socket socket)
