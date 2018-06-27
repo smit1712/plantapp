@@ -233,5 +233,16 @@
             android:id="@+id/tempbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+        <TextView
+            android:text="Light"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/Lighttxt" />
+        <ProgressBar
+            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            android:id="@+id/Lightbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </LinearLayout>

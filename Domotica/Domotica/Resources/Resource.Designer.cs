@@ -66,14 +66,23 @@ namespace Domotica
 			// aapt resource value: 0x7f06001a
 			public const int Controllayout = 2131099674;
 			
+			// aapt resource value: 0x7f060025
+			public const int Disconnect = 2131099685;
+			
+			// aapt resource value: 0x7f060022
+			public const int Lightbar = 2131099682;
+			
+			// aapt resource value: 0x7f060021
+			public const int Lighttxt = 2131099681;
+			
 			// aapt resource value: 0x7f060011
 			public const int PlantLayout = 2131099665;
 			
 			// aapt resource value: 0x7f06001f
 			public const int Temptxt = 2131099679;
 			
-			// aapt resource value: 0x7f060022
-			public const int abort = 2131099682;
+			// aapt resource value: 0x7f060024
+			public const int abort = 2131099684;
 			
 			// aapt resource value: 0x7f06001e
 			public const int aqbar = 2131099678;
@@ -93,8 +102,8 @@ namespace Domotica
 			// aapt resource value: 0x7f060008
 			public const int editTextIPPort = 2131099656;
 			
-			// aapt resource value: 0x7f060021
-			public const int exit = 2131099681;
+			// aapt resource value: 0x7f060023
+			public const int exit = 2131099683;
 			
 			// aapt resource value: 0x7f06001b
 			public const int humidity = 2131099675;
@@ -211,10 +220,13 @@ namespace Domotica
 		{
 			
 			// aapt resource value: 0x7f040013
-			public const int Humidityresult = 2130968595;
+			public const int Disconnect = 2130968595;
 			
 			// aapt resource value: 0x7f040014
-			public const int Tempresult = 2130968596;
+			public const int Humidityresult = 2130968596;
+			
+			// aapt resource value: 0x7f040015
+			public const int Tempresult = 2130968597;
 			
 			// aapt resource value: 0x7f040012
 			public const int abort = 2130968594;

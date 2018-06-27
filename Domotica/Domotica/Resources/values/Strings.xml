@@ -19,6 +19,7 @@
   <string name="debug_value">-</string>
   <string name="exit">Exit</string>
   <string name="abort">Abort</string>
+  <string name="Disconnect">Disconnect</string>
 
   <string name="Humidityresult">0</string>
   <string name="Tempresult">0</string>

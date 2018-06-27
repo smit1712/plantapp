@@ -4,6 +4,7 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Timers;
+using System.Threading;
 using Android.App;
 using Android.Content;
 using Android.Runtime;
@@ -29,17 +30,18 @@ namespace Domotica
         Button buttonConnect;
         Button buttonChangePinState;
         TextView textViewServerConnect, textViewTimerStateValue;
-        public TextView temptxt,suntxt, airqualitytxt,humiditytxt,windtxt,raintxt, textViewChangePinStateValue, textViewSensorValue, textViewDebugValue;
+        public TextView lighttxt,temptxt,suntxt, airqualitytxt,humiditytxt,windtxt,raintxt, textViewChangePinStateValue, textViewSensorValue, textViewDebugValue;
         EditText editTextIPAddress, editTextIPPort;
         RelativeLayout connectlayout;
         LinearLayout plantlayout,controllayout;
         ToggleButton sunbtn, raintbtn, windbtn;
-        ProgressBar temp,humidity, Airquality;
-        Timer timerClock, timerSockets;            // Timers   
+        ProgressBar light,temp,humidity, Airquality;
+        System.Timers.Timer timerClock, timerSockets, timerUpdateBar;            // Timers   
         Socket socket = null;                       // Socket           
         List<Tuple<string, TextView>> commandList = new List<Tuple<string, TextView>>();  // List for commands and response places on UI
         int listIndex = 0;
 
+        string h = "0", a = "0", t = "0", l = "0";
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -74,13 +76,16 @@ namespace Domotica
             humidity = FindViewById<ProgressBar>(Resource.Id.humidityBar);
             Airquality = FindViewById<ProgressBar>(Resource.Id.aqbar);
             temp = FindViewById<ProgressBar>(Resource.Id.tempbar);
+            light = FindViewById<ProgressBar>(Resource.Id.Lightbar);
+            lighttxt = FindViewById<TextView>(Resource.Id.Lighttxt);
             UpdateConnectionState(4, "Disconnected");
+
 
             plantlayout.Visibility = ViewStates.Gone;
             controllayout.Visibility = ViewStates.Gone;
             
             // Init commandlist, scheduled by socket timer
-            commandList.Add(new Tuple<string, TextView>("s", textViewChangePinStateValue));
+            //commandList.Add(new Tuple<string, TextView>("s", textViewChangePinStateValue));
             //commandList.Add(new Tuple<string, TextView>("R", textViewSensorValue));// rain on command
             //commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue));// rain off command
             //commandList.Add(new Tuple<string, TextView>("W", textViewSensorValue));// wind on command
@@ -104,18 +109,32 @@ namespace Domotica
                 RunOnUiThread(() => { textViewTimerStateValue.Text = DateTime.Now.ToString("h:mm:ss"); }); 
             };
 
+            timerUpdateBar = new System.Timers.Timer() { Interval = 2000, Enabled = true }; // Interval >= 1000
+            timerUpdateBar.Elapsed += (obj, args) =>
+            {
+                if (socket.Connected) // only if socket exists
+                {
+                    System.Diagnostics.Debug.WriteLine("UpdateBar");
+                    UpdateBar();
+                } else
+                {
+                    System.Diagnostics.Debug.WriteLine("Nope");
+                }
+            };
+
             // timer object, check Arduino state
             // Only one command can be serviced in an timer tick, schedule from list
-            timerSockets = new System.Timers.Timer() { Interval = 1000, Enabled = false }; // Interval >= 750
+            timerSockets = new System.Timers.Timer() { Interval = 2000, Enabled = false }; // Interval >= 750
             timerSockets.Elapsed += (obj, args) =>
             {
+
                 //RunOnUiThread(() =>
                 
                     if (socket != null) // only if socket exists
                     {
-                        // Send a command to the Arduino server on every tick (loop though list)
-                        UpdateGUI(executeCommand(commandList[listIndex].Item1), commandList[listIndex].Item2);  //e.g. UpdateGUI(executeCommand("s"), textViewChangePinStateValue);
-                    
+                    // Send a command to the Arduino server on every tick (loop though list)
+                    //UpdateGUI(executeCommand(commandList[listIndex].Item1), commandList[listIndex].Item2);  //e.g. UpdateGUI(executeCommand("s"), textViewChangePinStateValue);
+
                     if (++listIndex >= commandList.Count) listIndex = 0;                  
                     }
                     else timerSockets.Enabled = false;  // If socket broken -> disable timer
@@ -131,9 +150,6 @@ namespace Domotica
                     if (CheckValidIpAddress(editTextIPAddress.Text) && CheckValidPort(editTextIPPort.Text))
                     {
                         ConnectSocket(editTextIPAddress.Text, editTextIPPort.Text);
-                        connectlayout.Visibility = ViewStates.Gone;// when connection is made, the connectlayout is hidden
-                        plantlayout.Visibility = ViewStates.Visible;// when connection is made, the plantlayout is visible
-                        controllayout.Visibility = ViewStates.Visible;// when connection is made, the plantlayout is visible
                         this.Title = "Smart Terrarium";
                     }
                     else UpdateConnectionState(3, "Please check IP");
@@ -154,7 +170,8 @@ namespace Domotica
                 if (raintbtn.Checked && CheckCon(socket) == true)
                 {
                     socket.Send(Encoding.ASCII.GetBytes("R"));                 // Send toggle-command to the Arduino
-                 
+                    resetbtn(raintbtn, 2500, "r");
+
                 }
                 else
                 {
@@ -169,6 +186,7 @@ namespace Domotica
                 if (windbtn.Checked && CheckCon(socket) == true)
                 {
                     socket.Send(Encoding.ASCII.GetBytes("W"));                 // Send toggle-command to the Arduino
+                    resetbtn(windbtn, 25000, "w");
                     
                 }
                 else
@@ -184,6 +202,8 @@ namespace Domotica
                 if (sunbtn.Checked && CheckCon(socket) == true)
                 {
                     socket.Send(Encoding.ASCII.GetBytes("Z"));                 // Send toggle-command to the Arduino
+                    resetbtn(sunbtn, 25000, "z");
+                    
                 }
                 else
                 {
@@ -194,22 +214,44 @@ namespace Domotica
                     }
             };
         }
-
+        public async void resetbtn(ToggleButton togglebutten, int waittime, string cmd)
+        {
+            await Task.Delay(waittime);
+            togglebutten.Checked = false;
+            socket.Send(Encoding.ASCII.GetBytes(cmd));                
+        }
         //happens when the gui is updated, it updates the progressbars
         public void UpdateBar()
         {
-            string h = executeCommand("h");
-            string a = executeCommand("a");
-            string t = executeCommand("t");
-            humidity.Progress = Convert.ToInt32("h");
-            Airquality.Progress = Convert.ToInt32("a");
-            temp.Progress = Convert.ToInt32("t");
-            humiditytxt.Text = "humidity: " + h;
-            airqualitytxt.Text = "Air Quality:" + a;
-            temptxt.Text = "Tempature: " + t;
+            /*h = executeCommand("h");
+            a = executeCommand("a");
+            t = executeCommand("t");
+            l = executeCommand("l");*/
+
+            VisualUpdateBar("humidity: ", executeCommand("h"), humiditytxt, humidity);
+            VisualUpdateBar("Air: ", executeCommand("a"), airqualitytxt, Airquality);
+            VisualUpdateBar("Temprature: ", executeCommand("t"), temptxt, temp);
+            VisualUpdateBar("Light: ", executeCommand("l"), lighttxt, light);
+
+
+                /*System.Diagnostics.Debug.WriteLine("----------------------");
+                System.Diagnostics.Debug.WriteLine(h);
+                System.Diagnostics.Debug.WriteLine(a);
+                System.Diagnostics.Debug.WriteLine(t);
+                System.Diagnostics.Debug.WriteLine(l);
+                System.Diagnostics.Debug.WriteLine("----------------------");*/
         }
 
-        public bool CheckCon(Socket socket)
+        public void VisualUpdateBar(string b4result, string result, TextView textview, ProgressBar progressBar)
+        {
+            RunOnUiThread(() =>
+            {
+                textview.Text = b4result + result;
+                progressBar.Progress = Convert.ToInt32(result);
+            });
+        }
+
+    public bool CheckCon(Socket socket)
         {
             if (socket == null)
             {
@@ -303,7 +345,6 @@ namespace Domotica
         public void UpdateGUI(string result, TextView textview)
         {
 
-            UpdateBar();
             RunOnUiThread(() =>
             {
                 if (result == "OFF") textview.SetTextColor(Color.Red);
@@ -331,10 +372,16 @@ namespace Domotica
                         if (socket.Connected)
                         {
                             UpdateConnectionState(2, "Connected");
-                            timerSockets.Enabled = true;                //Activate timer for communication with Arduino     
+                            //timerSockets.Enabled = true;                //Activate timer for communication with Arduino
+                            timerUpdateBar.Enabled = true;
+
+                            connectlayout.Visibility = ViewStates.Gone;// when connection is made, the connectlayout is hidden
+                            plantlayout.Visibility = ViewStates.Visible;// when connection is made, the plantlayout is visible
+                            controllayout.Visibility = ViewStates.Visible;// when connection is made, the plantlayout is visible
                         }
                     } catch (Exception exception) {
-                        timerSockets.Enabled = false;
+                        //timerSockets.Enabled = false;
+                        timerUpdateBar.Enabled = false;
                         if (socket != null)
                         {
                             socket.Close();
@@ -346,7 +393,8 @@ namespace Domotica
                 else // disconnect socket
                 {
                     socket.Close(); socket = null;
-                    timerSockets.Enabled = false;
+                    timerUpdateBar.Enabled = false;
+                    //timerSockets.Enabled = false;
                     UpdateConnectionState(4, "Disconnected");
                 }
             });
@@ -384,6 +432,12 @@ namespace Domotica
                     System.Environment.Exit(0);
                     return true;
                 case Resource.Id.abort:
+                    return true;
+                case Resource.Id.Disconnect:
+                    socket = null;
+                    buttonConnect.Enabled = true;
+                    buttonConnect.Text = "Connect";
+                    CheckCon(socket);
                     return true;
             }
             return base.OnOptionsItemSelected(item);
