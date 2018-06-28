@@ -28,20 +28,19 @@ namespace Domotica
         // Variables (components/controls)
         // Controls on GUI
         Button buttonConnect;
-        Button buttonChangePinState;
         TextView textViewServerConnect, textViewTimerStateValue;
-        public TextView lighttxt,temptxt,suntxt, airqualitytxt,humiditytxt,windtxt,raintxt, textViewChangePinStateValue, textViewSensorValue, textViewDebugValue;
+        public TextView lighttxt,temptxt,suntxt, airqualitytxt, humiditytxt, windtxt, raintxt;
         EditText editTextIPAddress, editTextIPPort;
         RelativeLayout connectlayout;
         LinearLayout plantlayout,controllayout;
         ToggleButton sunbtn, raintbtn, windbtn;
         ProgressBar light,temp,humidity, Airquality;
-        System.Timers.Timer timerClock, timerSockets, timerUpdateBar;            // Timers   
-        Socket socket = null;                       // Socket           
-        List<Tuple<string, TextView>> commandList = new List<Tuple<string, TextView>>();  // List for commands and response places on UI
+        System.Timers.Timer timerClock, timerUpdateBar;            // Timers   
+        Socket socket = null;                                      // Socket           
+        //List<Tuple<string, TextView>> commandList = new List<Tuple<string, TextView>>();  // List for commands and response places on UI
         int listIndex = 0;
 
-        string h = "0", a = "0", t = "0", l = "0";
+        //string h = "0", a = "0", t = "0", l = "0";
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -53,12 +52,8 @@ namespace Domotica
 
             // find and set the controls, so it can be used in the code
             buttonConnect = FindViewById<Button>(Resource.Id.buttonConnect);
-            buttonChangePinState = FindViewById<Button>(Resource.Id.buttonChangePinState);
             textViewTimerStateValue = FindViewById<TextView>(Resource.Id.textViewTimerStateValue);
             textViewServerConnect = FindViewById<TextView>(Resource.Id.textViewServerConnect);
-            textViewChangePinStateValue = FindViewById<TextView>(Resource.Id.textViewChangePinStateValue);
-            textViewSensorValue = FindViewById<TextView>(Resource.Id.textViewSensorValue);
-            textViewDebugValue = FindViewById<TextView>(Resource.Id.textViewDebugValue);
             editTextIPAddress = FindViewById<EditText>(Resource.Id.editTextIPAddress);
             editTextIPPort = FindViewById<EditText>(Resource.Id.editTextIPPort);
             connectlayout = FindViewById<RelativeLayout>(Resource.Id.Connectlayout);
@@ -86,18 +81,6 @@ namespace Domotica
             
             // Init commandlist, scheduled by socket timer
             //commandList.Add(new Tuple<string, TextView>("s", textViewChangePinStateValue));
-            //commandList.Add(new Tuple<string, TextView>("R", textViewSensorValue));// rain on command
-            //commandList.Add(new Tuple<string, TextView>("r", textViewSensorValue));// rain off command
-            //commandList.Add(new Tuple<string, TextView>("W", textViewSensorValue));// wind on command
-            //commandList.Add(new Tuple<string, TextView>("w", textViewSensorValue));// wind off command
-            //commandList.Add(new Tuple<string, TextView>("Z", textViewSensorValue));// sun on command
-            //commandList.Add(new Tuple<string, TextView>("z", textViewSensorValue));// sun off command
-
-            //commandList.Add(new Tuple<string, TextView>("h", textViewSensorValue));// request humidity
-            //commandList.Add(new Tuple<string, TextView>("a", textViewSensorValue));// request air quality
-            //commandList.Add(new Tuple<string, TextView>("t", textViewSensorValue));// request temp
-
-
 
             this.Title = "Connect To Terrarium";
             
@@ -114,31 +97,8 @@ namespace Domotica
             {
                 if (socket.Connected) // only if socket exists
                 {
-                    System.Diagnostics.Debug.WriteLine("UpdateBar");
                     UpdateBar();
-                } else
-                {
-                    System.Diagnostics.Debug.WriteLine("Nope");
                 }
-            };
-
-            // timer object, check Arduino state
-            // Only one command can be serviced in an timer tick, schedule from list
-            timerSockets = new System.Timers.Timer() { Interval = 2000, Enabled = false }; // Interval >= 750
-            timerSockets.Elapsed += (obj, args) =>
-            {
-
-                //RunOnUiThread(() =>
-                
-                    if (socket != null) // only if socket exists
-                    {
-                    // Send a command to the Arduino server on every tick (loop though list)
-                    //UpdateGUI(executeCommand(commandList[listIndex].Item1), commandList[listIndex].Item2);  //e.g. UpdateGUI(executeCommand("s"), textViewChangePinStateValue);
-
-                    if (++listIndex >= commandList.Count) listIndex = 0;                  
-                    }
-                    else timerSockets.Enabled = false;  // If socket broken -> disable timer
-                //});
             };
 
             //Add the "Connect" button handler.
@@ -156,92 +116,76 @@ namespace Domotica
                 };
             }
 
-            //Add the "Change pin state" button handler.
-            if (buttonChangePinState != null)
-            {
-                buttonChangePinState.Click += (sender, e) =>
-                {
-                    socket.Send(Encoding.ASCII.GetBytes("t"));                 // Send toggle-command to the Arduino
-                };
-            }
             //rain,wind,sun buttonevents  when toggled they send a command to the arduino
             raintbtn.Click += delegate
-            {              
-                if (raintbtn.Checked && CheckCon(socket) == true)
+            {
+                if (CheckCon(socket))
                 {
-                    socket.Send(Encoding.ASCII.GetBytes("R"));                 // Send toggle-command to the Arduino
-                    resetbtn(raintbtn, 2500, "r");
-
-                }
-                else
-                {
-                    if (CheckCon(socket) == true)
+                    if (raintbtn.Checked)
                     {
-                    socket.Send(Encoding.ASCII.GetBytes("r"));                 // Send toggle-command to the Arduino 
+                        socket.Send(Encoding.ASCII.GetBytes("R"));                 // Send toggle-command to the Arduino
+                        resetbtn(raintbtn, 2500, "r");
+
+                    }
+                    else
+                    {
+                        socket.Send(Encoding.ASCII.GetBytes("r"));                 // Send toggle-command to the Arduino 
                     }
                 }
             };
             windbtn.Click += delegate
-            {              
-                if (windbtn.Checked && CheckCon(socket) == true)
+            {
+                if (CheckCon(socket))
                 {
-                    socket.Send(Encoding.ASCII.GetBytes("W"));                 // Send toggle-command to the Arduino
-                    resetbtn(windbtn, 25000, "w");
-                    
-                }
-                else
-                {
-                    if(CheckCon(socket) == true)
+                    if (windbtn.Checked)
                     {
-                    socket.Send(Encoding.ASCII.GetBytes("w"));                 // Send toggle-command to the Arduino
+                        socket.Send(Encoding.ASCII.GetBytes("W"));                 // Send toggle-command to the Arduino
+                        resetbtn(windbtn, 25000, "w");
+                    }
+                    else
+                    {
+                        socket.Send(Encoding.ASCII.GetBytes("w"));                 // Send toggle-command to the Arduino
                     }
                 }
             };
             sunbtn.Click += delegate
             {
-                if (sunbtn.Checked && CheckCon(socket) == true)
+                if (CheckCon(socket))
                 {
-                    socket.Send(Encoding.ASCII.GetBytes("Z"));                 // Send toggle-command to the Arduino
-                    resetbtn(sunbtn, 25000, "z");
-                    
-                }
-                else
-                {
-                    if (CheckCon(socket) == true)
+                    if (sunbtn.Checked)
+                    {
+                        socket.Send(Encoding.ASCII.GetBytes("Z"));                 // Send toggle-command to the Arduino
+                        resetbtn(sunbtn, 25000, "z");
+                    }
+                    else
                     {
                         socket.Send(Encoding.ASCII.GetBytes("z"));                 // Send toggle-command to the Arduino
                     }
-                    }
+                }
             };
         }
+
         public async void resetbtn(ToggleButton togglebutten, int waittime, string cmd)
         {
             await Task.Delay(waittime);
             togglebutten.Checked = false;
             socket.Send(Encoding.ASCII.GetBytes(cmd));                
         }
-        //happens when the gui is updated, it updates the progressbars
+
+        /// <summary>
+        /// Calls method that updates GUI multiple times
+        /// </summary>
         public void UpdateBar()
         {
-            /*h = executeCommand("h");
-            a = executeCommand("a");
-            t = executeCommand("t");
-            l = executeCommand("l");*/
-
             VisualUpdateBar("humidity: ", executeCommand("h"), humiditytxt, humidity);
             VisualUpdateBar("Air: ", executeCommand("a"), airqualitytxt, Airquality);
             VisualUpdateBar("Temprature: ", executeCommand("t"), temptxt, temp);
             VisualUpdateBar("Light: ", executeCommand("l"), lighttxt, light);
-
-
-                /*System.Diagnostics.Debug.WriteLine("----------------------");
-                System.Diagnostics.Debug.WriteLine(h);
-                System.Diagnostics.Debug.WriteLine(a);
-                System.Diagnostics.Debug.WriteLine(t);
-                System.Diagnostics.Debug.WriteLine(l);
-                System.Diagnostics.Debug.WriteLine("----------------------");*/
         }
 
+        /// <summary>
+        /// Updates a textview & progressbar with values given
+        /// </summary>
         public void VisualUpdateBar(string b4result, string result, TextView textview, ProgressBar progressBar)
         {
             RunOnUiThread(() =>
@@ -337,21 +281,6 @@ namespace Domotica
                     textViewServerConnect.SetTextColor(color);
                     buttonConnect.Enabled = butConEnabled;
                 }
-                buttonChangePinState.Enabled = butPinEnabled;
-            });
-        }
-
-        //Update GUI based on Arduino response
-        public void UpdateGUI(string result, TextView textview)
-        {
-
-            RunOnUiThread(() =>
-            {
-                if (result == "OFF") textview.SetTextColor(Color.Red);
-                else if (result == " ON") textview.SetTextColor(Color.Green);
-                else textview.SetTextColor(Color.White);  
-                textview.Text = result;
-               
             });
         }
 
