@@ -144,21 +144,21 @@
             android:layout_height="match_parent"
             android:id="@+id/linearLayout4">
             <EditText
-                android:text="25000"
+                android:text="5"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/rainDelay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="39.5dp" />
             <EditText
-                android:text="25000"
+                android:text="5"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/windDelay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="39.5dp" />
             <EditText
-                android:text="25000"
+                android:text="5"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:id="@+id/sunDelay"
                 android:layout_width="match_parent"

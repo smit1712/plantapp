@@ -176,7 +176,7 @@ namespace Domotica
                     if (windbtn.Checked)
                     {
                         socket.Send(Encoding.ASCII.GetBytes("W"));                 // Send toggle-command to the Arduino
-                        resetbtn(windbtn, 25000, "w");
+                        resetbtn(windbtn, absDelay, "w");
                     }
                     else
                     {
@@ -207,7 +207,7 @@ namespace Domotica
                     if (sunbtn.Checked)
                     {
                         socket.Send(Encoding.ASCII.GetBytes("Z"));                 // Send toggle-command to the Arduino
-                        resetbtn(sunbtn, 25000, "z");
+                        resetbtn(sunbtn, absDelay, "z");
                     }
                     else
                     {
@@ -229,7 +229,7 @@ namespace Domotica
         /// </summary>
         public void UpdateBar()
         {
-            VisualUpdateBar("humidity: ", executeCommand("h"), humiditytxt, humidity);
+            VisualUpdateBar("Ground: ", executeCommand("h"), humiditytxt, humidity);
             VisualUpdateBar("Air: ", executeCommand("a"), airqualitytxt, Airquality);
             VisualUpdateBar("Temprature: ", executeCommand("t"), temptxt, temp);
             VisualUpdateBar("Light: ", executeCommand("l"), lighttxt, light);
