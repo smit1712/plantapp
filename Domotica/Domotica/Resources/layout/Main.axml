@@ -102,9 +102,9 @@
             <TextView
                 android:text="Rain"
                 android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/rainTXT"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/rainTXT" />
+                android:layout_height="wrap_content" />
             <TextView
                 android:text="Wind"
                 android:textAppearance="?android:attr/textAppearanceLarge"
@@ -137,6 +137,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/sunBTN" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/linearLayout4">
+            <EditText
+                android:text="25000"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/rainDelay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="39.5dp" />
+            <EditText
+                android:text="25000"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/windDelay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="39.5dp" />
+            <EditText
+                android:text="25000"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/sunDelay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="39.5dp" />
         </LinearLayout>
     </LinearLayout>
     <LinearLayout

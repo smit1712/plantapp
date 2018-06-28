@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="application_name">Domotica App</string>
+  <string name="application_name">Smart Terrarium</string>
   <string name="timer_state_text">Time</string>
   <string name="timer_state_value">OFF</string>
   <string name="arduino_server_text">Arduino server</string>

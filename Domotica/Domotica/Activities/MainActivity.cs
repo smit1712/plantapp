@@ -30,7 +30,7 @@ namespace Domotica
         Button buttonConnect;
         TextView textViewServerConnect, textViewTimerStateValue;
         public TextView lighttxt,temptxt,suntxt, airqualitytxt, humiditytxt, windtxt, raintxt;
-        EditText editTextIPAddress, editTextIPPort;
+        EditText editTextIPAddress, editTextIPPort, rainDelay, windDelay, sunDelay;
         RelativeLayout connectlayout;
         LinearLayout plantlayout,controllayout;
         ToggleButton sunbtn, raintbtn, windbtn;
@@ -38,7 +38,7 @@ namespace Domotica
         System.Timers.Timer timerClock, timerUpdateBar;            // Timers   
         Socket socket = null;                                      // Socket           
         //List<Tuple<string, TextView>> commandList = new List<Tuple<string, TextView>>();  // List for commands and response places on UI
-        int listIndex = 0;
+        //int listIndex = 0;
 
         //string h = "0", a = "0", t = "0", l = "0";
 
@@ -73,6 +73,10 @@ namespace Domotica
             temp = FindViewById<ProgressBar>(Resource.Id.tempbar);
             light = FindViewById<ProgressBar>(Resource.Id.Lightbar);
             lighttxt = FindViewById<TextView>(Resource.Id.Lighttxt);
+            rainDelay = FindViewById<EditText>(Resource.Id.rainDelay);
+            windDelay = FindViewById<EditText>(Resource.Id.windDelay);
+            sunDelay = FindViewById<EditText>(Resource.Id.sunDelay);
+
             UpdateConnectionState(4, "Disconnected");
 
 
@@ -121,10 +125,26 @@ namespace Domotica
             {
                 if (CheckCon(socket))
                 {
+                    
+                    string delay = rainDelay.Text;
+                    int checkDelay;
+                    if (int.TryParse(delay, out checkDelay)) {
+                        if (checkDelay < 2)
+                        {
+                            checkDelay = 2;
+                        }
+                    } else
+                    {
+                        checkDelay = 2;
+                        rainDelay.Text = "2";
+                    }
+
+                    int absDelay = checkDelay * 1000;
+
                     if (raintbtn.Checked)
                     {
                         socket.Send(Encoding.ASCII.GetBytes("R"));                 // Send toggle-command to the Arduino
-                        resetbtn(raintbtn, 2500, "r");
+                        resetbtn(raintbtn, absDelay, "r");
 
                     }
                     else
@@ -137,6 +157,22 @@ namespace Domotica
             {
                 if (CheckCon(socket))
                 {
+                    string delay = windDelay.Text;
+                    int checkDelay;
+                    if (int.TryParse(delay, out checkDelay))
+                    {
+                        if (checkDelay < 2)
+                        {
+                            checkDelay = 2;
+                        }
+                    }
+                    else
+                    {
+                        checkDelay = 2;
+                        windDelay.Text = "2";
+                    }
+
+                    int absDelay = checkDelay * 1000;
                     if (windbtn.Checked)
                     {
                         socket.Send(Encoding.ASCII.GetBytes("W"));                 // Send toggle-command to the Arduino
@@ -152,6 +188,22 @@ namespace Domotica
             {
                 if (CheckCon(socket))
                 {
+                    string delay = sunDelay.Text;
+                    int checkDelay;
+                    if (int.TryParse(delay, out checkDelay))
+                    {
+                        if (checkDelay < 2)
+                        {
+                            checkDelay = 2;
+                        }
+                    }
+                    else
+                    {
+                        checkDelay = 2;
+                        sunDelay.Text = "2";
+                    }
+
+                    int absDelay = checkDelay * 1000;
                     if (sunbtn.Checked)
                     {
                         socket.Send(Encoding.ASCII.GetBytes("Z"));                 // Send toggle-command to the Arduino
@@ -256,7 +308,6 @@ namespace Domotica
             bool butConEnabled = true;      // default state
             Color color = Color.Red;        // default color
             // pinButton
-            bool butPinEnabled = false;     // default state 
 
             //Set "Connect" button label according to connection state.
             if (state == 1)
@@ -269,7 +320,6 @@ namespace Domotica
             {
                 butConText = "Disconnect";
                 color = Color.Green;
-                butPinEnabled = true;
             }
             //Edit the control's properties on the UI thread
             RunOnUiThread(() =>
